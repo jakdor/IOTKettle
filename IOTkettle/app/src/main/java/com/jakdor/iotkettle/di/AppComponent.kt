@@ -6,6 +6,9 @@ import dagger.Component
 import dagger.android.support.AndroidSupportInjectionModule
 import javax.inject.Singleton
 
+/**
+ * Dagger AppComponent configuration
+ */
 @Singleton
 @Component(modules = [(AndroidSupportInjectionModule::class),
     (AppModule::class),

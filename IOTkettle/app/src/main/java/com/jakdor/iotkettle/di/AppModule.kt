@@ -8,6 +8,9 @@ import dagger.Module
 import dagger.Provides
 import javax.inject.Singleton
 
+/**
+ * App-wide dependencies injection point
+ */
 @Module
 class AppModule {
 

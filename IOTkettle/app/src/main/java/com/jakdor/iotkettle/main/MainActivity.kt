@@ -54,6 +54,38 @@ class MainActivity : AppCompatActivity() {
     private var timerStart: Long = 0
     private var timer: Long = 0
 
+    override fun onCreate(savedInstanceState: Bundle?) {
+        AndroidInjection.inject(this)
+        super.onCreate(savedInstanceState)
+        setContentView(R.layout.activity_main)
+        appContext = this
+
+        preferences = PreferenceManager.getDefaultSharedPreferences(this)
+        connectionString = preferences!!.getString(getString(R.string.ip_string), "192.168.1.188")
+
+        dummyTextView = findViewById<View>(R.id.textView) as TextView
+        timerDisplayTextView = findViewById<View>(R.id.timerDisplayTextView) as TextView
+        ipTextEdit = findViewById<View>(R.id.editText) as EditText
+        ipTextEdit!!.setText(connectionString)
+
+        findViewById<View>(R.id.button).setOnTouchListener(changeIpButtonListener)
+
+        notifyIcon = BitmapFactory.decodeResource(resources, R.drawable.kettler)
+        notifyIcon2 = BitmapFactory.decodeResource(resources, R.drawable.kettler2)
+
+        connect()
+
+        iotHelper.changeIotClient(iotClient)
+        Thread(iotHelper).start()
+
+        timerHandler.postDelayed(timerRunnable, 0)
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        timerHandler.removeCallbacks(null)
+    }
+
     /**
      * ChangeIP button listener
      */
@@ -68,11 +100,11 @@ class MainActivity : AppCompatActivity() {
             connectionString = newIp
         }
 
-        iotClient!!.kill()
+        iotClient.kill()
         connect()
 
         notificationCounter = 0
-        iotHelper!!.changeIotClient(iotClient!!)
+        iotHelper.changeIotClient(iotClient)
 
         false
     }
@@ -81,7 +113,7 @@ class MainActivity : AppCompatActivity() {
      * Main loop, change check every 1000ms
      */
     internal var timerHandler = Handler()
-    internal var timerRunnable: Runnable = object : Runnable {
+    private var timerRunnable: Runnable = object : Runnable {
         override fun run() {
             checkConnection()
             receive()
@@ -105,7 +137,7 @@ class MainActivity : AppCompatActivity() {
      */
     private fun connect() {
         dummyTextView!!.setText(R.string.status_connecting)
-        iotClient!!.connectIP = connectionString!!
+        iotClient.connectIP = connectionString!!
         Thread(iotClient).start()
     }
 
@@ -113,13 +145,13 @@ class MainActivity : AppCompatActivity() {
      * checks connection, restarts if needed
      */
     private fun checkConnection() {
-        if (!iotClient!!.isConnectionOK) {
+        if (!iotClient.isConnectionOK) {
             ++retryCounter
             dummyTextView!!.setText(R.string.status_no_connection)
             if (retryCounter > 5) {
-                iotClient!!.kill()
+                iotClient.kill()
                 connect()
-                iotHelper!!.changeIotClient(iotClient!!)
+                iotHelper.changeIotClient(iotClient)
                 retryCounter = 0
             }
         } else if (notificationCounter == 0) {
@@ -131,10 +163,10 @@ class MainActivity : AppCompatActivity() {
      * GUI response for received data
      */
     private fun receive() {
-        if (iotHelper!!.isNotifyFlag) {
-            iotHelper!!.notifyHandled()
+        if (iotHelper.isNotifyFlag) {
+            iotHelper.notifyHandled()
 
-            val received = iotHelper!!.received
+            val received = iotHelper.received
 
             if (received == "start") {
                 sendNotification("Czajnik uruchomiony", time, false)
@@ -211,37 +243,5 @@ class MainActivity : AppCompatActivity() {
         val mNotificationManager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
 
         mNotificationManager.notify(notificationCounter++, mBuilder.build())
-    }
-
-    override fun onCreate(savedInstanceState: Bundle?) {
-        AndroidInjection.inject(this)
-        super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_main)
-        appContext = this
-
-        preferences = PreferenceManager.getDefaultSharedPreferences(this)
-        connectionString = preferences!!.getString(getString(R.string.ip_string), "192.168.1.188")
-
-        dummyTextView = findViewById<View>(R.id.textView) as TextView
-        timerDisplayTextView = findViewById<View>(R.id.timerDisplayTextView) as TextView
-        ipTextEdit = findViewById<View>(R.id.editText) as EditText
-        ipTextEdit!!.setText(connectionString)
-
-        findViewById<View>(R.id.button).setOnTouchListener(changeIpButtonListener)
-
-        notifyIcon = BitmapFactory.decodeResource(resources, R.drawable.kettler)
-        notifyIcon2 = BitmapFactory.decodeResource(resources, R.drawable.kettler2)
-
-        connect()
-
-        iotHelper!!.changeIotClient(iotClient!!)
-        Thread(iotHelper).start()
-
-        timerHandler.postDelayed(timerRunnable, 0)
-    }
-
-    override fun onDestroy() {
-        super.onDestroy()
-        timerHandler.removeCallbacks(null)
     }
 }
