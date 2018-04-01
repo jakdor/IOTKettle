@@ -1,4 +1,4 @@
-package com.jakdor.iotkettle.main
+package com.jakdor.iotkettle.network
 
 import android.util.Log
 
@@ -6,7 +6,9 @@ import android.util.Log
  * Helper class, keeps connection up despite app state
  * todo refactor into service
  */
-internal class IOTHelper(private var iotClient: IOTClient?) : Thread() {
+class IOTHelper : Thread() {
+
+    lateinit var iotClient: IOTClient
 
     var received: String? = null
         private set

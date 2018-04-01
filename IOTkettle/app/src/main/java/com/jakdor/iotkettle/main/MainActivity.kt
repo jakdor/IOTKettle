@@ -17,16 +17,24 @@ import android.widget.EditText
 import android.widget.TextView
 
 import com.jakdor.iotkettle.R
+import com.jakdor.iotkettle.network.IOTClient
+import com.jakdor.iotkettle.network.IOTHelper
+import dagger.android.AndroidInjection
 
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
 import java.util.concurrent.TimeUnit
+import javax.inject.Inject
 
 class MainActivity : AppCompatActivity() {
 
-    private var iotClient: IOTClient? = null
-    private var iotHelper: IOTHelper? = null
+    @Inject
+    lateinit var iotClient: IOTClient
+
+    @Inject
+    lateinit var iotHelper: IOTHelper
+
     private var preferences: SharedPreferences? = null
 
     private var dummyTextView: TextView? = null
@@ -97,7 +105,7 @@ class MainActivity : AppCompatActivity() {
      */
     private fun connect() {
         dummyTextView!!.setText(R.string.status_connecting)
-        iotClient = IOTClient(connectionString!!)
+        iotClient!!.connectIP = connectionString!!
         Thread(iotClient).start()
     }
 
@@ -206,6 +214,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
+        AndroidInjection.inject(this)
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
         appContext = this
@@ -225,7 +234,7 @@ class MainActivity : AppCompatActivity() {
 
         connect()
 
-        iotHelper = IOTHelper(iotClient)
+        iotHelper!!.changeIotClient(iotClient!!)
         Thread(iotHelper).start()
 
         timerHandler.postDelayed(timerRunnable, 0)

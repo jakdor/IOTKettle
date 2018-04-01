@@ -1,4 +1,4 @@
-package com.jakdor.iotkettle.main
+package com.jakdor.iotkettle.network
 
 import android.util.Log
 
@@ -10,7 +10,9 @@ import java.net.Socket
 /**
  * Handles connection between app and device
  */
-class IOTClient(private val connectIP: String) : Thread() {
+class IOTClient : Thread() {
+
+    lateinit var connectIP: String
 
     private var receiveMessage: String? = null
 
