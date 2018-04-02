@@ -1,5 +1,7 @@
 package com.jakdor.iotkettle.main
 
+import kotlinx.android.synthetic.main.activity_main.*
+
 import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.content.Context
@@ -13,9 +15,6 @@ import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
 import android.preference.PreferenceManager
 import android.support.v4.app.NotificationCompat
-import android.view.View
-import android.widget.EditText
-import android.widget.TextView
 
 import com.jakdor.iotkettle.R
 import dagger.android.AndroidInjection
@@ -25,10 +24,6 @@ class MainActivity : AppCompatActivity(), MainContract.MainView {
 
     @Inject
     lateinit var presenter: MainPresenter
-
-    private var statusTextView: TextView? = null
-    private var timerDisplayTextView: TextView? = null
-    private var ipTextEdit: EditText? = null
 
     private lateinit var preferences: SharedPreferences
 
@@ -42,10 +37,6 @@ class MainActivity : AppCompatActivity(), MainContract.MainView {
         AndroidInjection.inject(this)
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
-
-        statusTextView = findViewById<View>(R.id.textView) as TextView
-        timerDisplayTextView = findViewById<View>(R.id.timerDisplayTextView) as TextView
-        ipTextEdit = findViewById<View>(R.id.editText) as EditText
 
         preferences = PreferenceManager.getDefaultSharedPreferences(this)
         notifyIcon = BitmapFactory.decodeResource(resources, R.drawable.kettler)
@@ -87,7 +78,7 @@ class MainActivity : AppCompatActivity(), MainContract.MainView {
      * Call [MainPresenter.onIpChanged] on ChangeIpButton click
      */
     override fun setIpChangedButtonListener() {
-        findViewById<View>(R.id.button).setOnClickListener({ presenter.onIpChanged() })
+       changeIpButton.setOnClickListener({ presenter.onIpChanged() })
     }
 
     /**
@@ -150,15 +141,15 @@ class MainActivity : AppCompatActivity(), MainContract.MainView {
     }
 
     override fun setIpEditText(ip: String) {
-        ipTextEdit!!.setText(ip)
+        ipEditText.setText(ip)
     }
 
     override fun setIpEditText(resId: Int) {
-        ipTextEdit!!.setText(resId)
+        ipEditText.setText(resId)
     }
 
     override fun getIpEditText(): String {
-        return ipTextEdit!!.text.toString()
+        return ipEditText.text.toString()
     }
 
     override fun setStatusTextView(status: String) {

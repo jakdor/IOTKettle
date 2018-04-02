@@ -1,5 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<android.support.constraint.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/activity_main"
     android:layout_width="match_parent"
@@ -11,39 +13,54 @@
     tools:context="com.jakdor.iotkettle.main.MainActivity">
 
     <EditText
-        android:text="@string/ip_string"
-        android:layout_width="wrap_content"
+        android:id="@+id/ipEditText"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:inputType="phone"
-        android:ems="10"
-        android:layout_alignParentTop="true"
         android:layout_alignParentStart="true"
-        android:id="@+id/editText" />
+        android:layout_alignParentTop="true"
+        android:layout_marginEnd="8dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="8dp"
+        android:inputType="phone"
+        app:layout_constraintEnd_toStartOf="@+id/changeIpButton"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
 
     <TextView
+        android:id="@+id/statusTextView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_alignParentStart="true"
+        android:layout_below="@+id/ipEditText"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="8dp"
+        android:labelFor="@id/ipEditText"
         android:text="@string/status_text"
-        android:id="@+id/textView"
-        android:layout_below="@+id/editText"
-        android:layout_alignParentStart="true" />
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/ipEditText" />
 
     <Button
-        android:text="@string/ip_button"
+        android:id="@+id/changeIpButton"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:id="@+id/button"
-        android:layout_alignBaseline="@+id/editText"
-        android:layout_alignBottom="@+id/editText"
-        android:layout_toEndOf="@+id/editText" />
+        android:layout_height="0dp"
+        android:layout_alignBaseline="@+id/ipEditText"
+        android:layout_alignBottom="@+id/ipEditText"
+        android:layout_marginEnd="8dp"
+        android:layout_marginTop="8dp"
+        android:layout_toEndOf="@+id/ipEditText"
+        android:text="@string/ip_button"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
 
     <TextView
-        android:text=""
+        android:id="@+id/timerDisplayTextView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_below="@+id/textView"
-        android:layout_alignEnd="@+id/textView"
-        android:layout_marginTop="11dp"
-        android:id="@+id/timerDisplayTextView" />
+        android:layout_alignEnd="@+id/statusTextView"
+        android:layout_below="@+id/statusTextView"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="8dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/statusTextView" />
 
-</RelativeLayout>
+</android.support.constraint.ConstraintLayout>
