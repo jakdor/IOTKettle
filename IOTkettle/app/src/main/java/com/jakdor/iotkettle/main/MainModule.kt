@@ -1,7 +1,5 @@
 package com.jakdor.iotkettle.main
 
-import com.jakdor.iotkettle.network.IOTClient
-import com.jakdor.iotkettle.network.IOTHelper
 import dagger.Module
 import dagger.Provides
 
@@ -9,9 +7,7 @@ import dagger.Provides
 class MainModule {
 
     @Provides
-    fun provideMainPresenter(mainView: MainContract.MainView,
-                             iotClient: IOTClient,
-                             iotHelper: IOTHelper): MainPresenter {
-        return MainPresenter(mainView, iotClient, iotHelper)
+    fun provideMainPresenter(mainView: MainContract.MainView): MainPresenter {
+        return MainPresenter(mainView)
     }
 }

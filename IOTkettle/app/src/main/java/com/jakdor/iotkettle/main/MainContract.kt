@@ -9,11 +9,9 @@ interface MainContract {
         fun loadIp()
         fun saveIp(ip: String)
         fun setIpChangedButtonListener()
-        fun sendNotification(title: String, text: String, type: Boolean)
-        fun getNotificationCounter(): Int
-        fun setNotificationCounter(id: Int)
 
-        fun startService()
+        fun startService(ip: String)
+        fun changeServiceIp(ip: String)
         fun stopService()
 
         fun setIpEditText(ip: String)
@@ -29,7 +27,6 @@ interface MainContract {
         fun onIpChanged()
         fun connect()
         fun receive()
-        fun checkConnection()
         fun displayTimer()
     }
 }

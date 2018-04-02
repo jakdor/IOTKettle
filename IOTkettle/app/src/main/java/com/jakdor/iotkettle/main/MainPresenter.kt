@@ -1,17 +1,10 @@
 package com.jakdor.iotkettle.main
 
-import com.jakdor.iotkettle.R
 import com.jakdor.iotkettle.mvp.BasePresenter
-import com.jakdor.iotkettle.network.IOTClient
-import com.jakdor.iotkettle.network.IOTHelper
-import java.text.SimpleDateFormat
 import java.util.*
 import java.util.concurrent.TimeUnit
-import android.os.Handler
 
-class MainPresenter(view: MainContract.MainView,
-                    private val iotClient: IOTClient,
-                    private val iotHelper: IOTHelper)
+class MainPresenter(view: MainContract.MainView)
     : BasePresenter<MainContract.MainView>(view), MainContract.MainPresenter {
 
     lateinit var connectionString: String
@@ -20,41 +13,12 @@ class MainPresenter(view: MainContract.MainView,
     private var timerStart: Long = 0
     private var timer: Long = 0
 
-    private var retryCounter = 0
-
-    override fun start(){
+    override fun start() {
         super.start()
-        connect()
-
-        iotHelper.changeIotClient(iotClient)
-        Thread(iotHelper).start()
-
-        timerHandler.postDelayed(timerRunnable, 0)
+        view.startService(connectionString)
     }
 
-    override fun destroy() {
-        super.destroy()
-        timerHandler.removeCallbacks(null)
-    }
-
-    /**
-     * Main loop, change check every 1000ms
-     */
-    internal var timerHandler = Handler()
-    private var timerRunnable: Runnable = object : Runnable {
-        override fun run() {
-            checkConnection()
-            receive()
-            timeCounter()
-
-            timerHandler.postDelayed(this, 1000)
-        }
-    }
-
-    /**
-     * Defines behaviour for IpChangedButton onClick Event
-     */
-    override fun onIpChanged(){
+    override fun onIpChanged() {
         val newIp = view.getIpEditText()
 
         if (connectionString != newIp) {
@@ -62,60 +26,15 @@ class MainPresenter(view: MainContract.MainView,
             connectionString = newIp
         }
 
-        iotClient.kill()
-        connect()
-
-        view.setNotificationCounter(0)
-        iotHelper.changeIotClient(iotClient)
-
+        view.changeServiceIp(connectionString)
     }
 
-    /**
-     * Start connection threat
-     */
     override fun connect() {
-        view.setStatusTextView(R.string.status_connecting)
-        iotClient.connectIP = connectionString
-        Thread(iotClient).start()
+        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
     }
 
-    /**
-     * Process received data
-     */
     override fun receive() {
-        if (iotHelper.isNotifyFlag) {
-            iotHelper.notifyHandled()
-
-            val received = iotHelper.received
-
-            if (received == "start") {
-                view.sendNotification("Czajnik uruchomiony", time, false)
-                view.setStatusTextView(R.string.status_working)
-                timerFlag = true
-            } else if (received == "stop1") {
-                view.sendNotification("Czajnik wyłączony", time, true)
-                view.setStatusTextView(R.string.status_ended)
-                timerFlag = false
-            }
-        }
-    }
-
-    /**
-     * Checks connection, restarts if needed
-     */
-    override fun checkConnection() {
-        if (!iotClient.isConnectionOK) {
-            ++retryCounter
-            view.setStatusTextView(R.string.status_no_connection)
-            if (retryCounter > 5) {
-                iotClient.kill()
-                connect()
-                iotHelper.changeIotClient(iotClient)
-                retryCounter = 0
-            }
-        } else if (view.getNotificationCounter() == 0) {
-            view.setStatusTextView(R.string.status_text)
-        }
+        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
     }
 
     /**
@@ -154,14 +73,4 @@ class MainPresenter(view: MainContract.MainView,
                     Locale.ENGLISH, "Czas działania: %1\$d:%2\$d", timer / 60, timer % 60))
         }
     }
-
-    /**
-     * Format current time for notifications
-     */
-    private val time: String
-        get() {
-            val sdf = SimpleDateFormat("HH:mm", Locale.getDefault())
-            return sdf.format(Date())
-        }
-
 }
