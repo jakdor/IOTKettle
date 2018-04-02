@@ -1,13 +1,18 @@
 <resources>
     <string name="app_name">IOTkettle</string>
 
-    <string name="ip_string">192.168.1.188</string>
+    <string name="ip_string">192.168.1.1</string>
+    <string name="default_ip_string">192.168.1.1</string>
 
     <string name="ip_button">Change IP</string>
 
     <string name="status_no_connection">Brak połączenia</string>
-    <string name="status_connecting">Łączenie...</string>
+    <string name="status_connecting">Łączenie…</string>
     <string name="status_text">Bezczynny</string>
-    <string name="status_working">Czajnik działa...</string>
+    <string name="status_working">Czajnik działa…</string>
     <string name="status_ended">Zakończono podgrzewanie</string>
+
+    <string name="notification_chanel_id">IotKettleChanel</string>
+    <string name="notification_chanel_name">IOTKettle</string>
+    <string name="notification_chanel_desc">IOTKettle</string>
 </resources>

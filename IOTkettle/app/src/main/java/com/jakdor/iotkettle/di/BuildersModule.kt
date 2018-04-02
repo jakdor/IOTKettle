@@ -1,6 +1,8 @@
 package com.jakdor.iotkettle.di
 
 import com.jakdor.iotkettle.main.MainActivity
+import com.jakdor.iotkettle.main.MainModule
+import com.jakdor.iotkettle.main.MainViewModule
 import dagger.Module
 import dagger.android.ContributesAndroidInjector
 
@@ -10,6 +12,6 @@ import dagger.android.ContributesAndroidInjector
 @Module
 abstract class BuildersModule {
 
-    @ContributesAndroidInjector()
+    @ContributesAndroidInjector(modules = [(MainViewModule::class), (MainModule::class)])
     abstract fun bindMainActivity(): MainActivity
 }

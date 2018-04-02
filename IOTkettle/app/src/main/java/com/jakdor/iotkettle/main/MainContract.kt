@@ -1,5 +1,6 @@
 package com.jakdor.iotkettle.main
 
+import android.content.Context
 import android.view.View
 
 /**
@@ -12,6 +13,8 @@ interface MainContract {
         fun getIpEditText(): String
         fun setStatusTextView(status: String)
         fun setTimerDisplayTextView(time: String)
+        fun getViewContext(): Context
+        fun getResourcesString(resId: Int): String
     }
 
     interface MainPresenter {
@@ -22,6 +25,6 @@ interface MainContract {
         fun receive()
         fun checkConnection()
         fun displayTimer()
-        fun sendNotification()
+        fun sendNotification(title: String, text: String, type: Boolean)
     }
 }

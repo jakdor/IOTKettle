@@ -82,6 +82,7 @@ class IOTClient : Thread() {
     fun kill() {
         try {
             sock!!.close()
+            isConnectionOK = false
         } catch (e: Exception) {
             Log.e("Exception", "Client can't close connection: " + e.toString())
         }

@@ -5,21 +5,21 @@ abstract class BasePresenter<out View> protected constructor(protected val view:
     /**
      * Common setup actions
      */
-    fun start() {
+    open fun start() {
 
     }
 
     /**
      * Common cleanup actions
      */
-    fun stop() {
+    open fun stop() {
 
     }
 
     /**
      * Common cleanup actions
      */
-    fun destroy() {
+    open fun destroy() {
 
     }
 
