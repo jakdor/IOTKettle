@@ -1,21 +1,22 @@
 package com.jakdor.iotkettle
 
-import android.app.Activity
-import android.app.Application
-import android.app.NotificationChannel
-import android.app.NotificationManager
+import android.app.*
 import android.content.Context
 import android.os.Build
 import com.jakdor.iotkettle.di.DaggerAppComponent
 import dagger.android.AndroidInjector
 import dagger.android.DispatchingAndroidInjector
 import dagger.android.HasActivityInjector
+import dagger.android.HasServiceInjector
 import javax.inject.Inject
 
-class App : Application(), HasActivityInjector{
+class App : Application(), HasActivityInjector, HasServiceInjector{
 
     @Inject
     lateinit var dispatchingAndroidInjector: DispatchingAndroidInjector<Activity>
+
+    @Inject
+    lateinit var dispatchingAndroidServiceInjector: DispatchingAndroidInjector<Service>
 
     override fun onCreate() {
         super.onCreate()
@@ -29,6 +30,10 @@ class App : Application(), HasActivityInjector{
 
     override fun activityInjector(): AndroidInjector<Activity> {
         return dispatchingAndroidInjector
+    }
+
+    override fun serviceInjector(): AndroidInjector<Service> {
+        return dispatchingAndroidServiceInjector
     }
 
     /**

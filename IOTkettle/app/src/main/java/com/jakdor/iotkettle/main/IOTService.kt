@@ -1,4 +1,4 @@
-package com.jakdor.iotkettle.network
+package com.jakdor.iotkettle.main
 
 import android.app.PendingIntent
 import android.app.Service
@@ -9,12 +9,26 @@ import android.os.IBinder
 import android.support.v4.app.NotificationCompat
 import android.util.Log
 import com.jakdor.iotkettle.R
-import com.jakdor.iotkettle.main.MainActivity
+import com.jakdor.iotkettle.network.IOTClient
+import com.jakdor.iotkettle.network.IOTHelper
+import dagger.android.AndroidInjection
+import javax.inject.Inject
 
 /**
  * Foreground service for keeping up connection - due to restrictions in API26+
  */
 class IOTService: Service() {
+
+    @Inject
+    lateinit var iotClient: IOTClient
+
+    @Inject
+    lateinit var iotHelper: IOTHelper
+
+    override fun onCreate() {
+        AndroidInjection.inject(this)
+        super.onCreate()
+    }
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
         if (intent != null && intent.action == ACTION.START_ACTION) {
@@ -59,9 +73,9 @@ class IOTService: Service() {
     interface ACTION {
         companion object {
             const val FOREGROUND_SERVICE = 2137
-            const val MAIN_ACTION = "com.jakdor.iotkettle.network.IOTService.action.main"
-            const val START_ACTION = "com.jakdor.iotkettle.network.IOTService.action.start"
-            const val STOP_ACTION = "com.jakdor.iotkettle.network.IOTService.action.stop"
+            const val MAIN_ACTION = "com.jakdor.iotkettle.main.IOTService.action.main"
+            const val START_ACTION = "com.jakdor.iotkettle.main.IOTService.action.start"
+            const val STOP_ACTION = "com.jakdor.iotkettle.main.IOTService.action.stop"
         }
     }
 

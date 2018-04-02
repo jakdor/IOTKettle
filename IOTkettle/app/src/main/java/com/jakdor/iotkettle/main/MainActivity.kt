@@ -18,7 +18,6 @@ import android.preference.PreferenceManager
 import android.support.v4.app.NotificationCompat
 
 import com.jakdor.iotkettle.R
-import com.jakdor.iotkettle.network.IOTService
 import dagger.android.AndroidInjection
 import javax.inject.Inject
 
