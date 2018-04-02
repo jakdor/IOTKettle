@@ -1,8 +1,18 @@
 package com.jakdor.iotkettle.main
 
+import android.app.NotificationChannel
+import android.app.NotificationManager
 import android.content.Context
+import android.content.SharedPreferences
+import android.graphics.Bitmap
+import android.graphics.BitmapFactory
+import android.graphics.Color
+import android.media.RingtoneManager
+import android.os.Build
 import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
+import android.preference.PreferenceManager
+import android.support.v4.app.NotificationCompat
 import android.view.View
 import android.widget.EditText
 import android.widget.TextView
@@ -20,6 +30,14 @@ class MainActivity : AppCompatActivity(), MainContract.MainView {
     private var timerDisplayTextView: TextView? = null
     private var ipTextEdit: EditText? = null
 
+    private lateinit var preferences: SharedPreferences
+
+    private lateinit var notifyIcon: Bitmap
+    private lateinit var notifyIcon2: Bitmap
+
+    private var notificationCounter = 0
+    private var channel: NotificationChannel? = null
+
     override fun onCreate(savedInstanceState: Bundle?) {
         AndroidInjection.inject(this)
         super.onCreate(savedInstanceState)
@@ -29,12 +47,18 @@ class MainActivity : AppCompatActivity(), MainContract.MainView {
         timerDisplayTextView = findViewById<View>(R.id.timerDisplayTextView) as TextView
         ipTextEdit = findViewById<View>(R.id.editText) as EditText
 
-        findViewById<View>(R.id.button).setOnClickListener(presenter.onIpChangedButtonListener())
+        preferences = PreferenceManager.getDefaultSharedPreferences(this)
+        notifyIcon = BitmapFactory.decodeResource(resources, R.drawable.kettler)
+        notifyIcon2 = BitmapFactory.decodeResource(resources, R.drawable.kettler2)
+
+        setIpChangedButtonListener()
     }
 
     override fun onStart() {
         super.onStart()
+        loadIp()
         presenter.start()
+        setIpEditText(presenter.connectionString)
     }
 
     override fun onDestroy() {
@@ -43,21 +67,94 @@ class MainActivity : AppCompatActivity(), MainContract.MainView {
     }
 
     /**
-     * Provides Activity Context to presenter
+     * Load IP String with SharedPreferencesManager
      */
-    override fun getViewContext(): Context {
-        return this
+    override fun loadIp() {
+        presenter.connectionString = preferences.getString(getString(R.string.ip_string),
+                getString(R.string.default_ip_string))
     }
 
     /**
-     * Returns String from Resources
+     * Save IP String with SharedPreferencesManager
      */
-    override fun getResourcesString(resId: Int): String {
-        return getString(resId)
+    override fun saveIp(ip: String) {
+        val editor = preferences.edit()
+        editor.putString(getString(R.string.ip_string), ip)
+        editor.apply()
+    }
+
+    /**
+     * Call [MainPresenter.onIpChanged] on ChangeIpButton click
+     */
+    override fun setIpChangedButtonListener() {
+        findViewById<View>(R.id.button).setOnClickListener({ presenter.onIpChanged() })
+    }
+
+    /**
+     * Builds and displays Android notification
+     */
+    override fun sendNotification(title: String, text: String, type: Boolean) {
+        val notifBuilder = NotificationCompat.Builder(
+                this, getString(R.string.notification_chanel_id))
+        notifBuilder.setContentTitle(title)
+        notifBuilder.setContentText(text)
+
+        if (type) {
+            val pattern = longArrayOf(500, 500, 500, 500, 500, 500, 500, 500, 500)
+            notifBuilder.setVibrate(pattern)
+            notifBuilder.setSmallIcon(android.R.drawable.ic_dialog_alert)
+            notifBuilder.setLights(Color.RED, 500, 500)
+            notifBuilder.setLargeIcon(notifyIcon2)
+            notifBuilder.priority = NotificationCompat.PRIORITY_DEFAULT
+        } else {
+            notifBuilder.setSmallIcon(android.R.drawable.ic_dialog_info)
+            notifBuilder.setLights(Color.BLUE, 500, 500)
+            notifBuilder.setLargeIcon(notifyIcon)
+            notifBuilder.priority = NotificationCompat.PRIORITY_DEFAULT
+        }
+
+        val alarmSound = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION)
+        notifBuilder.setSound(alarmSound)
+
+        val notificationManager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            if(channel == null){
+                setupNotificationChanel()
+                notificationManager.createNotificationChannel(channel)
+            }
+        }
+
+        notificationManager.notify(notificationCounter++, notifBuilder.build())
+    }
+
+    /**
+     * Setup Notification Chanel for API>=26
+     */
+    private fun setupNotificationChanel(){
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            val id = getString(R.string.notification_chanel_id)
+            val name = getString(R.string.notification_chanel_name)
+            val description = getString(R.string.notification_chanel_desc)
+            channel = NotificationChannel(id, name, NotificationManager.IMPORTANCE_DEFAULT)
+            channel?.description = description
+        }
+    }
+
+    override fun setNotificationCounter(id: Int) {
+        notificationCounter = id
+    }
+
+    override fun getNotificationCounter(): Int {
+        return notificationCounter
     }
 
     override fun setIpEditText(ip: String) {
         ipTextEdit!!.setText(ip)
+    }
+
+    override fun setIpEditText(resId: Int) {
+        ipTextEdit!!.setText(resId)
     }
 
     override fun getIpEditText(): String {
@@ -68,7 +165,15 @@ class MainActivity : AppCompatActivity(), MainContract.MainView {
         statusTextView!!.text = status
     }
 
+    override fun setStatusTextView(resId: Int) {
+       statusTextView!!.setText(resId)
+    }
+
     override fun setTimerDisplayTextView(time: String) {
         timerDisplayTextView!!.text = time
+    }
+
+    override fun setTimerDisplayTextView(resId: Int) {
+        timerDisplayTextView!!.setText(resId)
     }
 }
