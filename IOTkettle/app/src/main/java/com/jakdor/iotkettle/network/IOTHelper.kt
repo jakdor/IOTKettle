@@ -17,8 +17,8 @@ class IOTHelper : Thread() {
 
     override fun run() {
         while (true) {
-            if (iotClient!!.isConnectionOK) {
-                received = iotClient!!.receive()
+            if (iotClient.isConnectionOK) {
+                received = iotClient.receive()
                 if (received != null) {
                     isNotifyFlag = true
                 }

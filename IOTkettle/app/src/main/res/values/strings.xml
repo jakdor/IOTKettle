@@ -15,4 +15,8 @@
     <string name="notification_chanel_id">IotKettleChanel</string>
     <string name="notification_chanel_name">IOTKettle</string>
     <string name="notification_chanel_desc">IOTKettle</string>
+
+    <string name="service_chanel_id">IotKettleService</string>
+    <string name="service_chanel_name">IotKettleService</string>
+    <string name="service_chanel_desc">IOTKettle</string>
 </resources>

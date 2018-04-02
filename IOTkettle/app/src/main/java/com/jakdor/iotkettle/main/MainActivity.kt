@@ -5,6 +5,7 @@ import kotlinx.android.synthetic.main.activity_main.*
 import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.content.Context
+import android.content.Intent
 import android.content.SharedPreferences
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
@@ -17,6 +18,7 @@ import android.preference.PreferenceManager
 import android.support.v4.app.NotificationCompat
 
 import com.jakdor.iotkettle.R
+import com.jakdor.iotkettle.network.IOTService
 import dagger.android.AndroidInjection
 import javax.inject.Inject
 
@@ -78,7 +80,10 @@ class MainActivity : AppCompatActivity(), MainContract.MainView {
      * Call [MainPresenter.onIpChanged] on ChangeIpButton click
      */
     override fun setIpChangedButtonListener() {
-       changeIpButton.setOnClickListener({ presenter.onIpChanged() })
+       changeIpButton.setOnClickListener({
+           presenter.onIpChanged()
+           //test
+           startService()})
     }
 
     /**
@@ -130,6 +135,24 @@ class MainActivity : AppCompatActivity(), MainContract.MainView {
             channel = NotificationChannel(id, name, NotificationManager.IMPORTANCE_DEFAULT)
             channel?.description = description
         }
+    }
+
+    /**
+     * Start IOTService
+     */
+    override fun startService() {
+        val startIntent = Intent(this@MainActivity, IOTService::class.java)
+        startIntent.action = IOTService.ACTION.START_ACTION
+        startService(startIntent)
+    }
+
+    /**
+     * Stop IOTService
+     */
+    override fun stopService() {
+        val stopIntent = Intent(this@MainActivity, IOTService::class.java)
+        stopIntent.action = IOTService.ACTION.STOP_ACTION
+        startService(stopIntent)
     }
 
     override fun setNotificationCounter(id: Int) {

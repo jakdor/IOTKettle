@@ -13,6 +13,9 @@ interface MainContract {
         fun getNotificationCounter(): Int
         fun setNotificationCounter(id: Int)
 
+        fun startService()
+        fun stopService()
+
         fun setIpEditText(ip: String)
         fun setIpEditText(resId: Int)
         fun getIpEditText(): String
