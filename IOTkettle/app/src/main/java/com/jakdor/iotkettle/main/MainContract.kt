@@ -14,6 +14,9 @@ interface MainContract {
         fun changeServiceIp(ip: String)
         fun stopService()
 
+        fun startTimer()
+        fun stopTimer()
+
         fun setIpEditText(ip: String)
         fun setIpEditText(resId: Int)
         fun getIpEditText(): String
@@ -25,8 +28,12 @@ interface MainContract {
 
     interface MainPresenter {
         fun onIpChanged()
-        fun connect()
-        fun receive()
+        fun connected()
+        fun connecting()
+        fun disconnect()
+        fun receive(start: Boolean)
+        fun timeCounter()
         fun displayTimer()
+        fun stateChangeListener(appState: AppState)
     }
 }

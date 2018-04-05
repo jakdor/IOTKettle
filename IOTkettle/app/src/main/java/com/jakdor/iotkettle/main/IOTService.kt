@@ -14,6 +14,7 @@ import android.os.Build
 import android.os.Handler
 import android.os.IBinder
 import android.support.v4.app.NotificationCompat
+import android.support.v4.content.LocalBroadcastManager
 import android.util.Log
 import com.jakdor.iotkettle.R
 import com.jakdor.iotkettle.network.IOTClient
@@ -34,7 +35,7 @@ class IOTService: Service() {
     @Inject
     lateinit var iotHelper: IOTHelper
 
-    lateinit var connectionString: String
+    private lateinit var connectionString: String
 
     private var retryCounter = 0
 
@@ -107,6 +108,15 @@ class IOTService: Service() {
     }
 
     /**
+     * Send status update to [MainActivity]
+     */
+    fun sendStatusBroadcast(appState: AppState){
+        val intent = Intent("AppState")
+        intent.putExtra("state", appState)
+        LocalBroadcastManager.getInstance(this).sendBroadcast(intent)
+    }
+
+    /**
      * Main loop, change check every 1000ms
      */
     internal var timerHandler = Handler()
@@ -137,7 +147,8 @@ class IOTService: Service() {
      */
     fun connect() {
         //view.setStatusTextView(R.string.status_connecting)
-        //todo presenter notify connected
+        //todo presenter notify connecting
+        sendStatusBroadcast(AppState.CONNECTING)
         iotClient.connectIP = connectionString
         Thread(iotClient).start()
     }
@@ -156,11 +167,13 @@ class IOTService: Service() {
                 //view.setStatusTextView(R.string.status_working)
                 //timerFlag = true
                 //todo presenter notify start
+                sendStatusBroadcast(AppState.START)
             } else if (received == "stop1") {
                 sendNotification("Czajnik wyłączony", time, true)
                 //view.setStatusTextView(R.string.status_ended)
                 //timerFlag = false
                 //todo presenter notify stop
+                sendStatusBroadcast(AppState.STOP)
             }
         }
     }
@@ -173,6 +186,7 @@ class IOTService: Service() {
             ++retryCounter
             //view.setStatusTextView(R.string.status_no_connection)
             //todo presenter notify no connection
+            sendStatusBroadcast(AppState.DISCONNECTED)
             if (retryCounter > 5) {
                 iotClient.kill()
                 connect()
@@ -182,6 +196,7 @@ class IOTService: Service() {
         } else if (notificationCounter == 0) {
             //view.setStatusTextView(R.string.status_text)
             //todo presenter notify connected
+            sendStatusBroadcast(AppState.CONNECTED)
         }
     }
 

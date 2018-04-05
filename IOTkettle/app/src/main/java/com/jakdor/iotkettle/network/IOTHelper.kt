@@ -3,8 +3,7 @@ package com.jakdor.iotkettle.network
 import android.util.Log
 
 /**
- * Helper class, keeps connection up despite app state
- * todo refactor into service
+ * Helper class
  */
 class IOTHelper : Thread() {
 

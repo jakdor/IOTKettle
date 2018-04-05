@@ -22,11 +22,4 @@ abstract class BasePresenter<out View> protected constructor(protected val view:
     open fun destroy() {
 
     }
-
-    enum class RequestState {
-        IDLE,
-        LOADING,
-        COMPLETE,
-        ERROR
-    }
 }

@@ -1,5 +1,6 @@
 package com.jakdor.iotkettle.main
 
+import com.jakdor.iotkettle.R
 import com.jakdor.iotkettle.mvp.BasePresenter
 import java.util.*
 import java.util.concurrent.TimeUnit
@@ -13,11 +14,17 @@ class MainPresenter(view: MainContract.MainView)
     private var timerStart: Long = 0
     private var timer: Long = 0
 
+    /**
+     * Presenter start
+     */
     override fun start() {
         super.start()
         view.startService(connectionString)
     }
 
+    /**
+     * Presenter response to ui IpChangeButton
+     */
     override fun onIpChanged() {
         val newIp = view.getIpEditText()
 
@@ -29,18 +36,47 @@ class MainPresenter(view: MainContract.MainView)
         view.changeServiceIp(connectionString)
     }
 
-    override fun connect() {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+    override fun connected() {
+        view.setStatusTextView(R.string.status_connected)
     }
 
-    override fun receive() {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+    override fun connecting() {
+        view.setStatusTextView(R.string.status_connecting)
+    }
+
+    override fun disconnect() {
+        view.setStatusTextView(R.string.status_no_connection)
+    }
+
+    override fun receive(start: Boolean) {
+        if(start){
+            timerFlag = true
+            view.startTimer()
+            view.setStatusTextView(R.string.status_working)
+        } else {
+            timerFlag = false
+            view.stopTimer()
+            view.setStatusTextView(R.string.status_ended)
+        }
+    }
+
+    /**
+     * Presenter response to received state of [IOTService]
+     */
+    override fun stateChangeListener(appState: AppState) {
+        when (appState){
+            AppState.START -> receive(true)
+            AppState.STOP -> receive(false)
+            AppState.CONNECTING -> connecting()
+            AppState.CONNECTED -> connected()
+            AppState.DISCONNECTED -> disconnect()
+        }
     }
 
     /**
      * Elapsed time counter
      */
-    private fun timeCounter() {
+    override fun timeCounter() {
         if (timerFlag) {
             if (timerStart == 0L) {
                 timerStart = System.nanoTime()

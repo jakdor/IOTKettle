@@ -1,16 +1,17 @@
 package com.jakdor.iotkettle.main
 
+import android.content.*
 import kotlinx.android.synthetic.main.activity_main.*
 
-import android.content.Intent
-import android.content.SharedPreferences
 import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
+import android.os.Handler
 import android.preference.PreferenceManager
 
 import com.jakdor.iotkettle.R
 import dagger.android.AndroidInjection
 import javax.inject.Inject
+import android.support.v4.content.LocalBroadcastManager
 
 class MainActivity : AppCompatActivity(), MainContract.MainView {
 
@@ -27,18 +28,49 @@ class MainActivity : AppCompatActivity(), MainContract.MainView {
         preferences = PreferenceManager.getDefaultSharedPreferences(this)
 
         setIpChangedButtonListener()
-    }
 
-    override fun onStart() {
-        super.onStart()
         loadIp()
         presenter.start()
         setIpEditText(presenter.connectionString)
+        LocalBroadcastManager.getInstance(this)
+                .registerReceiver(iotServiceReceiver, IntentFilter("AppState"))
     }
 
     override fun onDestroy() {
         super.onDestroy()
         presenter.destroy()
+        LocalBroadcastManager.getInstance(this).unregisterReceiver(iotServiceReceiver)
+    }
+
+    /**
+     * Receiver forwarding [IOTService] state to [MainPresenter]
+     */
+    private val iotServiceReceiver = object : BroadcastReceiver() {
+        override fun onReceive(context: Context, intent: Intent) {
+            presenter.stateChangeListener(intent.extras.get("state") as AppState)
+        }
+    }
+
+    private var timerHandler = Handler()
+    private var timerRunnable: Runnable = object : Runnable {
+        override fun run() {
+            presenter.timeCounter()
+            timerHandler.postDelayed(this, 1000)
+        }
+    }
+
+    /**
+     * Start timer displaying elapsed time
+     */
+    override fun startTimer() {
+        timerHandler.postDelayed(timerRunnable, 0)
+    }
+
+    /**
+     * Stop timer displaying elapsed time
+     */
+    override fun stopTimer() {
+        timerHandler.removeCallbacks(null)
     }
 
     /**

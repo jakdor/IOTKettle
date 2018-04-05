@@ -8,7 +8,7 @@
 
     <string name="status_no_connection">Brak połączenia</string>
     <string name="status_connecting">Łączenie…</string>
-    <string name="status_text">Bezczynny</string>
+    <string name="status_connected">Bezczynny</string>
     <string name="status_working">Czajnik działa…</string>
     <string name="status_ended">Zakończono podgrzewanie</string>
 
