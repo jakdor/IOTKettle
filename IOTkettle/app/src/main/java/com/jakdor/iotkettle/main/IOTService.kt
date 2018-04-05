@@ -1,6 +1,5 @@
 package com.jakdor.iotkettle.main
 
-import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.app.PendingIntent
 import android.app.Service
@@ -10,7 +9,6 @@ import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.graphics.Color
 import android.media.RingtoneManager
-import android.os.Build
 import android.os.Handler
 import android.os.IBinder
 import android.support.v4.app.NotificationCompat
@@ -42,12 +40,18 @@ class IOTService: Service() {
     private lateinit var notifyIcon: Bitmap
     private lateinit var notifyIcon2: Bitmap
 
+    private var notificationId = 0
     private var notificationCounter = 0
-    private var channel: NotificationChannel? = null
+    private lateinit var notificationBuilder: NotificationCompat.Builder
 
     override fun onCreate() {
         AndroidInjection.inject(this)
         super.onCreate()
+
+        notifyIcon = BitmapFactory.decodeResource(resources, R.drawable.kettler)
+        notifyIcon2 = BitmapFactory.decodeResource(resources, R.drawable.kettler2)
+        notificationBuilder =
+                NotificationCompat.Builder(this, getString(R.string.service_chanel_id))
     }
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
@@ -65,12 +69,7 @@ class IOTService: Service() {
 
             val icon = BitmapFactory.decodeResource(resources, R.drawable.kettler)
 
-            notifyIcon = BitmapFactory.decodeResource(resources, R.drawable.kettler)
-            notifyIcon2 = BitmapFactory.decodeResource(resources, R.drawable.kettler2)
-
-            val notification = NotificationCompat.Builder(
-                    this, getString(R.string.service_chanel_id))
-                    .setContentTitle(getString(R.string.service_chanel_name))
+            notificationBuilder.setContentTitle(getString(R.string.service_chanel_name))
                     .setTicker(getString(R.string.service_chanel_name))
                     .setContentText(getString(R.string.service_chanel_desc))
                     .setSmallIcon(R.drawable.kettler)
@@ -78,9 +77,9 @@ class IOTService: Service() {
                             Bitmap.createScaledBitmap(icon, 128, 128, false))
                     .setContentIntent(pendingIntent)
                     .setOngoing(true)
-                    .build()
 
-            startForeground(ACTION.FOREGROUND_SERVICE, notification)
+            val notificationManager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+            notificationManager.notify(notificationId, notificationBuilder.build())
 
             connect()
 
@@ -124,8 +123,6 @@ class IOTService: Service() {
         override fun run() {
             checkConnection()
             receive()
-            //timeCounter()
-            //todo presenter start timer
 
             timerHandler.postDelayed(this, 1000)
         }
@@ -146,9 +143,8 @@ class IOTService: Service() {
      * Start connection threat
      */
     fun connect() {
-        //view.setStatusTextView(R.string.status_connecting)
-        //todo presenter notify connecting
         sendStatusBroadcast(AppState.CONNECTING)
+
         iotClient.connectIP = connectionString
         Thread(iotClient).start()
     }
@@ -164,15 +160,9 @@ class IOTService: Service() {
 
             if (received == "start") {
                 sendNotification("Czajnik uruchomiony", time, false)
-                //view.setStatusTextView(R.string.status_working)
-                //timerFlag = true
-                //todo presenter notify start
                 sendStatusBroadcast(AppState.START)
             } else if (received == "stop1") {
                 sendNotification("Czajnik wyłączony", time, true)
-                //view.setStatusTextView(R.string.status_ended)
-                //timerFlag = false
-                //todo presenter notify stop
                 sendStatusBroadcast(AppState.STOP)
             }
         }
@@ -184,9 +174,9 @@ class IOTService: Service() {
     fun checkConnection() {
         if (!iotClient.isConnectionOK) {
             ++retryCounter
-            //view.setStatusTextView(R.string.status_no_connection)
-            //todo presenter notify no connection
+
             sendStatusBroadcast(AppState.DISCONNECTED)
+
             if (retryCounter > 5) {
                 iotClient.kill()
                 connect()
@@ -194,8 +184,6 @@ class IOTService: Service() {
                 retryCounter = 0
             }
         } else if (notificationCounter == 0) {
-            //view.setStatusTextView(R.string.status_text)
-            //todo presenter notify connected
             sendStatusBroadcast(AppState.CONNECTED)
         }
     }
@@ -204,52 +192,33 @@ class IOTService: Service() {
      * Builds and displays Android notification
      */
     fun sendNotification(title: String, text: String, type: Boolean) {
-        val notifBuilder = NotificationCompat.Builder(
-                this, getString(R.string.notification_chanel_id))
-        notifBuilder.setContentTitle(title)
-        notifBuilder.setContentText(text)
+        notificationBuilder.setContentTitle(title)
+        notificationBuilder.setContentText(text)
 
         if (type) {
             val pattern = longArrayOf(500, 500, 500, 500, 500, 500, 500, 500, 500)
-            notifBuilder.setVibrate(pattern)
-            notifBuilder.setSmallIcon(android.R.drawable.ic_dialog_alert)
-            notifBuilder.setLights(Color.RED, 500, 500)
-            notifBuilder.setLargeIcon(notifyIcon2)
-            notifBuilder.priority = NotificationCompat.PRIORITY_DEFAULT
+            notificationBuilder.setVibrate(pattern)
+            notificationBuilder.setSmallIcon(android.R.drawable.ic_dialog_alert)
+            notificationBuilder.setLights(Color.RED, 500, 500)
+            notificationBuilder.setLargeIcon(notifyIcon2)
+            notificationBuilder.priority = NotificationCompat.PRIORITY_DEFAULT
         } else {
-            notifBuilder.setSmallIcon(android.R.drawable.ic_dialog_info)
-            notifBuilder.setLights(Color.BLUE, 500, 500)
-            notifBuilder.setLargeIcon(notifyIcon)
-            notifBuilder.priority = NotificationCompat.PRIORITY_DEFAULT
+            val pattern = longArrayOf(250, 250, 250)
+            notificationBuilder.setVibrate(pattern)
+            notificationBuilder.setSmallIcon(android.R.drawable.ic_dialog_info)
+            notificationBuilder.setLights(Color.BLUE, 500, 500)
+            notificationBuilder.setLargeIcon(notifyIcon)
+            notificationBuilder.priority = NotificationCompat.PRIORITY_DEFAULT
         }
 
         val alarmSound = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION)
-        notifBuilder.setSound(alarmSound)
+        notificationBuilder.setSound(alarmSound)
 
         val notificationManager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
-
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            if(channel == null){
-                setupNotificationChanel()
-                notificationManager.createNotificationChannel(channel)
-            }
-        }
-
-        notificationManager.notify(notificationCounter++, notifBuilder.build())
+        notificationManager.notify(notificationId, notificationBuilder.build())
+        ++notificationCounter
     }
 
-    /**
-     * Setup Notification Chanel for API>=26
-     */
-    private fun setupNotificationChanel(){
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            val id = getString(R.string.notification_chanel_id)
-            val name = getString(R.string.notification_chanel_name)
-            val description = getString(R.string.notification_chanel_desc)
-            channel = NotificationChannel(id, name, NotificationManager.IMPORTANCE_DEFAULT)
-            channel?.description = description
-        }
-    }
 
     /**
      * Format current time for notifications
@@ -262,7 +231,6 @@ class IOTService: Service() {
 
     interface ACTION {
         companion object {
-            const val FOREGROUND_SERVICE = 2137
             const val MAIN_ACTION = "com.jakdor.iotkettle.main.IOTService.action.main"
             const val START_ACTION = "com.jakdor.iotkettle.main.IOTService.action.start"
             const val STOP_ACTION = "com.jakdor.iotkettle.main.IOTService.action.stop"
