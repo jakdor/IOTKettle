@@ -69,9 +69,9 @@ class IOTService: Service() {
 
             val icon = BitmapFactory.decodeResource(resources, R.drawable.kettler)
 
-            notificationBuilder.setContentTitle(getString(R.string.service_chanel_name))
-                    .setTicker(getString(R.string.service_chanel_name))
-                    .setContentText(getString(R.string.service_chanel_desc))
+            notificationBuilder.setContentTitle(getString(R.string.service_chanel_desc))
+                    .setTicker(getString(R.string.service_chanel_desc))
+                    .setContentText(getString(R.string.service_idle_info))
                     .setSmallIcon(R.drawable.kettler)
                     .setLargeIcon(
                             Bitmap.createScaledBitmap(icon, 128, 128, false))

@@ -19,4 +19,5 @@
     <string name="service_chanel_id">IotKettleService</string>
     <string name="service_chanel_name">IotKettleService</string>
     <string name="service_chanel_desc">IOTKettle</string>
+    <string name="service_idle_info">Czekam na aktywność</string>
 </resources>
