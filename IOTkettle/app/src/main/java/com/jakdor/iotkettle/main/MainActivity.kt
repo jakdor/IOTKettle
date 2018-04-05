@@ -12,6 +12,7 @@ import com.jakdor.iotkettle.R
 import dagger.android.AndroidInjection
 import javax.inject.Inject
 import android.support.v4.content.LocalBroadcastManager
+import android.app.ActivityManager
 
 class MainActivity : AppCompatActivity(), MainContract.MainView {
 
@@ -32,14 +33,13 @@ class MainActivity : AppCompatActivity(), MainContract.MainView {
         loadIp()
         presenter.start()
         setIpEditText(presenter.connectionString)
-        LocalBroadcastManager.getInstance(this)
-                .registerReceiver(iotServiceReceiver, IntentFilter("AppState"))
+        registerReceiver(iotServiceReceiver, IntentFilter("IoTKettleAppState"))
     }
 
     override fun onDestroy() {
         super.onDestroy()
         presenter.destroy()
-        LocalBroadcastManager.getInstance(this).unregisterReceiver(iotServiceReceiver)
+        unregisterReceiver(iotServiceReceiver)
     }
 
     /**
@@ -101,10 +101,12 @@ class MainActivity : AppCompatActivity(), MainContract.MainView {
      * Start IOTService
      */
     override fun startService(ip: String) {
-        val startIntent = Intent(this@MainActivity, IOTService::class.java)
-        startIntent.putExtra("ip", ip)
-        startIntent.action = IOTService.ACTION.START_ACTION
-        startService(startIntent)
+        if(!isServiceRunning(IOTService::class.java)) {
+            val startIntent = Intent(this@MainActivity, IOTService::class.java)
+            startIntent.putExtra("ip", ip)
+            startIntent.action = IOTService.ACTION.START_ACTION
+            startService(startIntent)
+        }
     }
 
     /**
@@ -114,6 +116,19 @@ class MainActivity : AppCompatActivity(), MainContract.MainView {
         val stopIntent = Intent(this@MainActivity, IOTService::class.java)
         stopIntent.action = IOTService.ACTION.STOP_ACTION
         startService(stopIntent)
+    }
+
+    /**
+     * Check if service is already running
+     */
+    private fun isServiceRunning(serviceClass: Class<*>): Boolean {
+        val manager = getSystemService(Context.ACTIVITY_SERVICE) as ActivityManager
+        for (service in manager.getRunningServices(Integer.MAX_VALUE)) { //todo find replacement
+            if (serviceClass.name == service.service.className) {
+                return true
+            }
+        }
+        return false
     }
 
     /**

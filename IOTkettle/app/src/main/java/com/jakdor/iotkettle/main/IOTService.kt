@@ -40,7 +40,7 @@ class IOTService: Service() {
     private lateinit var notifyIcon: Bitmap
     private lateinit var notifyIcon2: Bitmap
 
-    private var notificationId = 0
+    private var notificationId = 2137
     private var notificationCounter = 0
     private lateinit var notificationBuilder: NotificationCompat.Builder
 
@@ -78,8 +78,7 @@ class IOTService: Service() {
                     .setContentIntent(pendingIntent)
                     .setOngoing(true)
 
-            val notificationManager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
-            notificationManager.notify(notificationId, notificationBuilder.build())
+            startForeground(notificationId, notificationBuilder.build())
 
             connect()
 
@@ -110,9 +109,9 @@ class IOTService: Service() {
      * Send status update to [MainActivity]
      */
     fun sendStatusBroadcast(appState: AppState){
-        val intent = Intent("AppState")
+        val intent = Intent("IoTKettleAppState")
         intent.putExtra("state", appState)
-        LocalBroadcastManager.getInstance(this).sendBroadcast(intent)
+        sendBroadcast(intent)
     }
 
     /**

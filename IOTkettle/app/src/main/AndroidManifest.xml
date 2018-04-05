@@ -22,7 +22,8 @@
             </intent-filter>
         </activity>
 
-        <service android:name=".main.IOTService"/>
+        <service android:name=".main.IOTService"
+            android:process=":externalProcess"/>
 
     </application>
 
