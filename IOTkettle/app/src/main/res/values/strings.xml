@@ -5,6 +5,7 @@
     <string name="default_ip_string">192.168.1.1</string>
 
     <string name="ip_button">Change IP</string>
+    <string name="disconnect_button">Disconnect</string>
 
     <string name="status_no_connection">Brak połączenia</string>
     <string name="status_connecting">Łączenie…</string>

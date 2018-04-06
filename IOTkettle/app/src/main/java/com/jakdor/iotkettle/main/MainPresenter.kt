@@ -48,6 +48,13 @@ class MainPresenter(view: MainContract.MainView)
         view.setStatusTextView(R.string.status_no_connection)
     }
 
+    override fun userDisconnect() {
+        view.stopService()
+        view.setStatusTextView(R.string.status_no_connection)
+        view.stopTimer()
+        view.setTimerDisplayTextView("")
+    }
+
     override fun receive(start: Boolean) {
         if(start){
             timerFlag = true

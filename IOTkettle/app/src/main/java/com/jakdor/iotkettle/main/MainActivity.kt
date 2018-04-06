@@ -13,6 +13,7 @@ import dagger.android.AndroidInjection
 import javax.inject.Inject
 import android.support.v4.content.LocalBroadcastManager
 import android.app.ActivityManager
+import android.view.View
 
 class MainActivity : AppCompatActivity(), MainContract.MainView {
 
@@ -29,6 +30,7 @@ class MainActivity : AppCompatActivity(), MainContract.MainView {
         preferences = PreferenceManager.getDefaultSharedPreferences(this)
 
         setIpChangedButtonListener()
+        setDisconnectButtonListener()
 
         loadIp()
         presenter.start()
@@ -70,7 +72,7 @@ class MainActivity : AppCompatActivity(), MainContract.MainView {
      * Stop timer displaying elapsed time
      */
     override fun stopTimer() {
-        timerHandler.removeCallbacks(null)
+        timerHandler.removeCallbacks(timerRunnable)
     }
 
     /**
@@ -95,6 +97,13 @@ class MainActivity : AppCompatActivity(), MainContract.MainView {
      */
     override fun setIpChangedButtonListener() {
        changeIpButton.setOnClickListener({ presenter.onIpChanged() })
+    }
+
+    /**
+     * Call [MainPresenter.userDisconnect] on DisconnectButton click
+     */
+    override fun setDisconnectButtonListener() {
+        disconnectButton.setOnClickListener({ presenter.userDisconnect() })
     }
 
     /**

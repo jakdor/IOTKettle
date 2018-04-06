@@ -9,6 +9,7 @@ interface MainContract {
         fun loadIp()
         fun saveIp(ip: String)
         fun setIpChangedButtonListener()
+        fun setDisconnectButtonListener()
 
         fun startService(ip: String)
         fun changeServiceIp(ip: String)
@@ -31,6 +32,7 @@ interface MainContract {
         fun connected()
         fun connecting()
         fun disconnect()
+        fun userDisconnect()
         fun receive(start: Boolean)
         fun timeCounter()
         fun displayTimer()

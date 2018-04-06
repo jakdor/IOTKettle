@@ -35,6 +35,8 @@ class IOTService: Service() {
 
     private lateinit var connectionString: String
 
+    private lateinit var helperThread: Thread
+
     private var retryCounter = 0
 
     private lateinit var notifyIcon: Bitmap
@@ -62,7 +64,6 @@ class IOTService: Service() {
 
             val notificationIntent = Intent(this, MainActivity::class.java)
             notificationIntent.action = ACTION.MAIN_ACTION
-            //notificationIntent.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_NEW_TASK
             notificationIntent.addCategory(Intent.CATEGORY_LAUNCHER)
             val pendingIntent = PendingIntent.getActivity(this, 0,
                     notificationIntent, 0)
@@ -83,17 +84,28 @@ class IOTService: Service() {
             connect()
 
             iotHelper.changeIotClient(iotClient)
-            Thread(iotHelper).start()
+            helperThread = Thread(iotHelper)
+            helperThread.start()
 
+            timerHandler = Handler()
             timerHandler.postDelayed(timerRunnable, 0)
 
         } else if (intent != null && intent.action == ACTION.IP_CHANGE_ACTION) {
             Log.i(CLASS_TAG, "Received change ip Intent")
             connectionString = intent.extras.getString("ip")
+
+            helperThread = Thread(iotHelper)
+            helperThread.start()
+            timerHandler = Handler()
+            timerHandler.postDelayed(timerRunnable, 0)
+
             onIpChanged()
         } else if (intent != null && intent.action == ACTION.STOP_ACTION) {
             Log.i(CLASS_TAG, "Received Stop Foreground Intent")
-            timerHandler.removeCallbacks(null)
+            timerHandler.removeCallbacks(timerRunnable)
+            iotClient.kill()
+            helperThread.interrupt()
+            notificationCounter = 0
             stopForeground(true)
             stopSelf()
         }
@@ -117,7 +129,7 @@ class IOTService: Service() {
     /**
      * Main loop, change check every 1000ms
      */
-    internal var timerHandler = Handler()
+    private lateinit var timerHandler: Handler
     private var timerRunnable: Runnable = object : Runnable {
         override fun run() {
             checkConnection()

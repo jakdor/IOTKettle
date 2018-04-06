@@ -25,10 +25,7 @@ class IOTHelper : Thread() {
 
             try {
                 Thread.sleep(10)
-            } catch (e: Exception) {
-                Log.e("Exception", e.message)
-            }
-
+            } catch (e: Exception) {}
         }
     }
 
