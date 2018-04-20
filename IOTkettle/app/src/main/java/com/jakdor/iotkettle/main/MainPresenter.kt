@@ -10,9 +10,11 @@ class MainPresenter(view: MainContract.MainView)
 
     lateinit var connectionString: String
 
-    private var timerFlag = false
-    private var timerStart: Long = 0
-    private var timer: Long = 0
+    var timerFlag = false
+    var timerStart: Long = 0
+        private set
+    var timer: Long = 0
+        private set
 
     /**
      * Presenter start
