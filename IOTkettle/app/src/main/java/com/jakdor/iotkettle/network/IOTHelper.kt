@@ -1,7 +1,5 @@
 package com.jakdor.iotkettle.network
 
-import android.util.Log
-
 /**
  * Helper class
  */

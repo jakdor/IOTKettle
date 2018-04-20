@@ -7,13 +7,11 @@ import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
 import android.os.Handler
 import android.preference.PreferenceManager
+import android.app.ActivityManager
 
 import com.jakdor.iotkettle.R
 import dagger.android.AndroidInjection
 import javax.inject.Inject
-import android.support.v4.content.LocalBroadcastManager
-import android.app.ActivityManager
-import android.view.View
 
 class MainActivity : AppCompatActivity(), MainContract.MainView {
 
