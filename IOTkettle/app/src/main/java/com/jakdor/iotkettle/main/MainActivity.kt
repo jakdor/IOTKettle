@@ -6,7 +6,6 @@ import kotlinx.android.synthetic.main.activity_main.*
 import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
 import android.os.Handler
-import android.preference.PreferenceManager
 import android.app.ActivityManager
 
 import com.jakdor.iotkettle.R
@@ -18,14 +17,13 @@ class MainActivity : AppCompatActivity(), MainContract.MainView {
     @Inject
     lateinit var presenter: MainPresenter
 
-    private lateinit var preferences: SharedPreferences
+    @Inject
+    lateinit var preferences: SharedPreferences
 
     override fun onCreate(savedInstanceState: Bundle?) {
         AndroidInjection.inject(this)
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
-
-        preferences = PreferenceManager.getDefaultSharedPreferences(this)
 
         setIpChangedButtonListener()
         setDisconnectButtonListener()
